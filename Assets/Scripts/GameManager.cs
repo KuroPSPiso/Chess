@@ -85,7 +85,6 @@ namespace Assets.Scripts
                         else if(letterCollumn == 2 || letterCollumn == 7)
                         {
                             pawnEntity = (GameObject)GameObject.Instantiate(prefabKnight, this.cells[x, y].transform);
-                            pawnEntity.transform.rotation = Quaternion.Euler(0, 270, 0);
                         }
                         else if(letterCollumn == 3 || letterCollumn == 6)
                         {
@@ -100,6 +99,7 @@ namespace Assets.Scripts
                             pawnEntity = (GameObject)GameObject.Instantiate(prefabKing, this.cells[x, y].transform);
                         }
                     }
+                    pawnEntity.transform.rotation = Quaternion.Euler(0, 270, 0);
 
                     Pawn pawn = pawnEntity.GetComponent<Pawn>();
                     pawn.UpdateLocation(this.cells[x, y]);
@@ -146,6 +146,7 @@ namespace Assets.Scripts
                             pawnEntity = (GameObject)GameObject.Instantiate(prefabKing, this.cells[x, y].transform);
                         }
                     }
+                    pawnEntity.transform.rotation = Quaternion.Euler(0, 90, 0);
 
                     Pawn pawn = pawnEntity.GetComponent<Pawn>();
                     pawn.UpdateLocation(this.cells[x, y]);

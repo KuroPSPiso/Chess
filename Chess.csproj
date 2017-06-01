@@ -76,6 +76,18 @@
     <Reference Include="UnityEngine.HoloLens">
       <HintPath>Library\UnityAssemblies\UnityEngine.HoloLens.dll</HintPath>
     </Reference>
+    <Reference Include="Apache.NMS">
+      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.NMS.Test">
+      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.Test.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.NMS.ActiveMQ.Test">
+      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.Test.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.NMS.ActiveMQ">
+      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Chess.Plugins.csproj">
@@ -84,17 +96,22 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Pawn.cs" />
-    <Compile Include="Assets\Scripts\Zoomer.cs" />
-    <Compile Include="Assets\Scripts\MessengerManager.cs" />
-    <Compile Include="Assets\Scripts\PawnType.cs" />
-    <Compile Include="Assets\Scripts\CheckSpace.cs" />
-    <Compile Include="Assets\Scripts\LookAt.cs" />
-    <Compile Include="Assets\Scripts\Point.cs" />
-    <Compile Include="Assets\Scripts\Movement.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Movement.cs" />
+    <Compile Include="Assets\Scripts\PawnType.cs" />
+    <Compile Include="Assets\Scripts\LookAt.cs" />
+    <Compile Include="Assets\NMSManager.cs" />
+    <Compile Include="Assets\Scripts\Zoomer.cs" />
+    <Compile Include="Assets\Scripts\CheckSpace.cs" />
+    <Compile Include="Assets\Scripts\Point.cs" />
+    <Compile Include="Assets\Scripts\MessengerManager.cs" />
+    <Compile Include="Assets\Scripts\Pawn.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.Test.xml" />
+    <None Include="Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.xml" />
+    <None Include="Assets\Scripts\Plugins\nms\Apache.NMS.Test.xml" />
+    <None Include="Assets\Scripts\Plugins\nms\Apache.NMS.xml" />
     <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlendModesOverlay.shader" />
     <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />

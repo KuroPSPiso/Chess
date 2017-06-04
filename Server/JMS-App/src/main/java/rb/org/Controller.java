@@ -1,6 +1,9 @@
 package rb.org;
 
+import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextArea;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.broker.TransportConnector;
@@ -16,18 +19,17 @@ public class Controller implements Initializable{
 
     BrokerService broker = new BrokerService();
     ChessServer chessServer;
+    Thread launchServer;
+
+    @FXML
+    TextArea taConsole;
+
+    Console console;
 
     public void initialize(URL location, ResourceBundle resources) {
-        System.out.print("Opening broker");
+        console = new Console(taConsole);
 
-        TransportConnector connector = new TransportConnector();
-        try {
-            connector.setUri(new URI("tcp://localhost:61616"));
-            broker.addConnector(connector);
-            broker.start();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        console.println("Opening broker");
 
         /*
         Thread launchFactory = new Thread(new Runnable() {
@@ -46,8 +48,10 @@ public class Controller implements Initializable{
         });
         launchFactory.setDaemon(true);
         launchFactory.start();*/
-        Thread launchServer = new Thread(new Runnable() {
+        launchServer = new Thread(new Runnable() {
             public void run() {
+                console.println("Starting chessServer");
+                chessServer = new ChessServer(broker, console);
                 while(!broker.isStarted())
                 {
                     try {
@@ -56,11 +60,27 @@ public class Controller implements Initializable{
                         e.printStackTrace();
                     }
                 }
-                System.out.print("Starting chessServer");
-                chessServer = new ChessServer();
+                console.println("ChessServer started.");
             }
         });
         launchServer.setDaemon(true);
         launchServer.start();
+    }
+
+    public void OnClick_CloseApplication()
+    {
+        this.chessServer.Close();
+
+        try {
+            this.broker.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        this.broker.waitUntilStopped();
+
+        this.launchServer.interrupt();
+
+        Platform.exit();
     }
 }

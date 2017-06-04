@@ -25,6 +25,9 @@ public class NMSManager : MonoBehaviour {
     public String queueVar = "";
     public String gameID = "";
     public String userID = "";
+    private String connectionString;
+
+    Player player;
 
     IConnectionFactory factory;
     IConnection connection;
@@ -40,14 +43,27 @@ public class NMSManager : MonoBehaviour {
 
     Thread _AsyncReadThread;
 
+    int iMsgCount = 0;
+
     // Use this for initialization
     void Start()
     {
+        this.player = GameObject.FindObjectOfType<Player>();
+        if (this.player == null)
+        {
+            //return to menu
+        }
+        else
+        {
+            this.gameID = this.player.GameCode;
+            this.userID = mTurnJSON.GetColourString(this.player.PlayerColour);
+        }
+
         this.connectUri = new Uri("activemq:" + connectionUri);
 
         this.factory = new NMSConnectionFactory(connectUri);
-
-        this.connection = factory.CreateConnection(); //("admin", "admin");
+        this.connection = factory.CreateConnection();
+        this.connection.ClientId = this.gameID + "/" + this.userID;
 
         this.ReloadData();
 
@@ -106,7 +122,7 @@ public class NMSManager : MonoBehaviour {
                 semaphore.WaitOne((int)receiveTimeout.TotalMilliseconds, true);
                 if (message == null)
                 {
-                    selfReference.UpdateText("No message received!" + "\n");
+                    //selfReference.UpdateText("No message received!" + "\n");
                 }
                 else
                 {
@@ -115,7 +131,7 @@ public class NMSManager : MonoBehaviour {
             }
             catch (Exception e)
             {
-                selfReference.UpdateText(e.Message + " -" + e.GetBaseException().ToString() + "\n");
+                //selfReference.UpdateText(e.Message + " -" + e.GetBaseException().ToString() + "\n");
             }
         });
 
@@ -136,12 +152,22 @@ public class NMSManager : MonoBehaviour {
             IMessageProducer producer = session.CreateProducer(destination);
             //connection.Start();
 
-            ITextMessage request = session.CreateTextMessage("SampleMessage");
-            request.Properties["User"] = userID;
-            request.Properties["AltUser"] = "black";
+            ITextMessage request = session.CreateTextMessage("SampleMessage" + iMsgCount.ToString());
+            request.Properties["User"] = mTurnJSON.GetColourString(player.PlayerColour);
+
+            if(player.PlayerColour.Equals(Color.black))
+            {
+                request.Properties["AltUser"] = mTurnJSON.GetColourString(Color.white);
+            }
+            else
+            {
+                request.Properties["AltUser"] = mTurnJSON.GetColourString(Color.black);
+            }
             request.NMSCorrelationID = gameID;
             request.NMSReplyTo = destination;
             producer.Send(request);
+
+            iMsgCount++;
         }
         catch (NMSConnectionException ex)
         {

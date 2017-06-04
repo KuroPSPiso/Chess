@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>2017.1.0b2</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -76,17 +78,17 @@
     <Reference Include="UnityEngine.HoloLens">
       <HintPath>Library\UnityAssemblies\UnityEngine.HoloLens.dll</HintPath>
     </Reference>
+    <Reference Include="Apache.NMS.ActiveMQ">
+      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.dll</HintPath>
+    </Reference>
+    <Reference Include="Apache.NMS.ActiveMQ.Test">
+      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.Test.dll</HintPath>
+    </Reference>
     <Reference Include="Apache.NMS">
       <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.dll</HintPath>
     </Reference>
     <Reference Include="Apache.NMS.Test">
       <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.Test.dll</HintPath>
-    </Reference>
-    <Reference Include="Apache.NMS.ActiveMQ.Test">
-      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.Test.dll</HintPath>
-    </Reference>
-    <Reference Include="Apache.NMS.ActiveMQ">
-      <HintPath>Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -96,16 +98,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\PlayerType.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Messages\mMovementJSON.cs" />
     <Compile Include="Assets\Scripts\Movement.cs" />
     <Compile Include="Assets\Scripts\PawnType.cs" />
     <Compile Include="Assets\Scripts\LookAt.cs" />
+    <Compile Include="Assets\Scripts\Messages\JSONType.cs" />
     <Compile Include="Assets\NMSManager.cs" />
     <Compile Include="Assets\Scripts\Zoomer.cs" />
+    <Compile Include="Assets\Scripts\Player.cs" />
     <Compile Include="Assets\Scripts\CheckSpace.cs" />
     <Compile Include="Assets\Scripts\Point.cs" />
+    <Compile Include="Assets\PlayerManager.cs" />
+    <Compile Include="Assets\Scripts\Messages\mPromotionJSON.cs" />
+    <Compile Include="Assets\Scripts\Messages\mTurnJSON.cs" />
     <Compile Include="Assets\Scripts\MessengerManager.cs" />
     <Compile Include="Assets\Scripts\Pawn.cs" />
+    <Compile Include="Assets\TESTNMSManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Scripts\Plugins\nms\Apache.NMS.ActiveMQ.Test.xml" />

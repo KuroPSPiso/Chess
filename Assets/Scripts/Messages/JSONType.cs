@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface JSONType {
 
-    string toJson(object obj);
+    string toJson();
     object fromJson(string json);
 
 }

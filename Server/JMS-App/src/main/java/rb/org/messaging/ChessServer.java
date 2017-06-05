@@ -6,8 +6,14 @@ import javafx.scene.control.TextAreaBuilder;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import rb.org.Console;
+import rb.org.domain.GameplayTypes;
+import rb.org.domain.Identity;
+import rb.org.domain.IdentityHolder;
+import rb.org.messaging.Impl.ConnectMessage;
+import rb.org.messaging.Impl.PingMessage;
 
 import javax.jms.*;
+import java.util.HashMap;
 
 /**
  * Created by bogaa on 6/1/2017.
@@ -26,6 +32,9 @@ public class ChessServer implements MessageListener {
     Console console;
     Connection connection;
 
+    HashMap<String, GameRoomMessages> roomMessagesHashMap = new HashMap<String, GameRoomMessages>();
+    IdentityHolder identityHolder;
+
     static {
         messageBrokerUrl = "tcp://localhost:61616";
         messageQueueName = "client.messages";
@@ -34,6 +43,8 @@ public class ChessServer implements MessageListener {
 
     public ChessServer(BrokerService broker, Console console) {
         this.console = console;
+        this.identityHolder = new IdentityHolder();
+
         try {
             //This message broker is embedded
             //BrokerService broker = new BrokerService();
@@ -47,6 +58,11 @@ public class ChessServer implements MessageListener {
         }
 
         this.setupMessageQueueConsumer();
+    }
+
+    public BrokerService getBroker()
+    {
+        return this.broker;
     }
 
     private void setupMessageQueueConsumer() {
@@ -77,19 +93,41 @@ public class ChessServer implements MessageListener {
             if (message instanceof TextMessage) {
                 TextMessage txtMsg = (TextMessage) message;
                 String messageText = txtMsg.getText();
-                response.setText(messageText);
-            }
-            response.setJMSCorrelationID(message.getJMSCorrelationID());
 
-            this.replyProducer.send(message.getJMSReplyTo(), response);
+                GameplayTypes gameplayType = GameplayTypes.None;
+
+                if(message.propertyExists("GameType")) {
+                    gameplayType = GameplayTypes.valueOf(message.getStringProperty("GameType"));
+                }
+
+                AMessageReply reply;
+
+                switch (gameplayType)
+                {
+                    case Connect:
+                        reply = new ConnectMessage(gameplayType.toString(), console);
+                        reply.sendMessage(session, message, txtMsg, this.replyProducer, message.getJMSDestination());
+                        this.identityHolder.putIdentity(message.getJMSCorrelationID(), new Identity(message.getJMSDestination()));
+                        break;
+                    case Movement:
+                        break;
+                    case Promotion:
+                        break;
+                    case Turn:
+                        break;
+                    case Finish:
+                        break;
+                    case Surrender:
+                        break;
+                    default:
+                        reply = new PingMessage(gameplayType.toString(), console);
+                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSDestination());
+                        break;
+                }
+            }
         } catch (JMSException e) {
             //Handle the exception appropriately
         }
-    }
-
-    public BrokerService getBroker()
-    {
-        return this.broker;
     }
 
     public void Close()

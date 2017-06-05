@@ -13,7 +13,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("/sample.fxml"));
         root.getStylesheets().add(this.getClass() .getResource("/Console.css").toExternalForm());
-        primaryStage.initStyle(StageStyle.UNDECORATED);
+        primaryStage.initStyle(StageStyle.DECORATED);
         primaryStage.setResizable(true);
         primaryStage.setTitle("Chess Server");
         primaryStage.setScene(new Scene(root, 300, 450));

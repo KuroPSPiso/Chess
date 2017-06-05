@@ -1,0 +1,50 @@
+Initialize engine version: 2017.1.0b2 (5e138e18bf82)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 770M (ID=0x11e0)
+    Vendor:   NVIDIA
+    VRAM:     3040 MB
+    Driver:   22.21.13.8205
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.Timeline.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\UnityEngine.Timeline.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\Apache.NMS.ActiveMQ.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\Apache.NMS.ActiveMQ.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\Apache.NMS.dll (this message is harmless)
+Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\Apache.NMS.dll into Unity Child Domain
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.dll (this message is harmless)
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Core.dll (this message is harmless)
+- Completed reload, in  0.030 seconds
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 3.108610 ms
+Setting up 4 worker threads for Enlighten.
+  Thread -> id: 4a48 -> priority: 1 
+  Thread -> id: 60bc -> priority: 1 
+  Thread -> id: 5e0c -> priority: 1 
+  Thread -> id: 3f20 -> priority: 1 
+Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.929423 ms
+
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1258.
+Total: 0.629077 ms (FindLiveObjects: 0.135993 ms CreateObjectMapping: 0.029508 ms MarkObjects: 0.441337 ms  DeleteObjects: 0.021382 ms)
+
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Xml.dll (this message is harmless)
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Transactions.dll (this message is harmless)
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Web.dll (this message is harmless)
+Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Configuration.dll (this message is harmless)
+InvalidClientIDException: Broker: localhost - Client: WHITE already connected from tcp://127.0.0.1:54215
+  at Apache.NMS.ActiveMQ.Connection.CheckConnected () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+

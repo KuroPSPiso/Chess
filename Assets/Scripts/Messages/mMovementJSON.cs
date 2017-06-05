@@ -28,7 +28,12 @@ public class mMovementJSON : JSONType
         return JsonUtility.FromJson<mMovementJSON>(json);
     }
 
-    public string toJson(object obj)
+    public string toJson()
+    {
+        return JsonUtility.ToJson(this);
+    }
+
+    public static string toJson(object obj)
     {
         return JsonUtility.ToJson(obj);
     }

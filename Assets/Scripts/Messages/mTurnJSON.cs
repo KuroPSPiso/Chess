@@ -52,7 +52,12 @@ public class mTurnJSON : JSONType
         return JsonUtility.FromJson<mTurnJSON>(json);
     }
 
-    public string toJson(object obj)
+    public string toJson()
+    {
+        return JsonUtility.ToJson(this);
+    }
+
+    public static string toJson(object obj)
     {
         return JsonUtility.ToJson(obj);
     }

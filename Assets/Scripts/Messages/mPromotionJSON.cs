@@ -22,7 +22,12 @@ public class mPromotionJSON : JSONType
         return JsonUtility.FromJson<mPromotionJSON>(json);
     }
 
-    public string toJson(object obj)
+    public string toJson()
+    {
+        return JsonUtility.ToJson(this);
+    }
+
+    public static string toJson(object obj)
     {
         return JsonUtility.ToJson(obj);
     }

@@ -24,12 +24,12 @@ public class Console extends OutputStream {
     public void println(String s){
 
         String oldData = output.getText();
-        if(oldData.length() < 50) {
+        if(oldData.length() < 200) {
             output.setText(s + "\n" + oldData);
         }
         else
         {
-            output.setText(s + "\n" + oldData.substring(0,50));
+            output.setText(s + "\n" + oldData.substring(0,200));
         }
 //        for (char c : s.toCharArray()) {
 //            try {

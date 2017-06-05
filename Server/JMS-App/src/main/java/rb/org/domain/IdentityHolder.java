@@ -35,6 +35,10 @@ public class IdentityHolder {
         return foundIdentity;
     }
 
+    public void removeIdentity(String correlationId){
+        this.identityHashMap.remove(correlationId);
+    }
+
     /**
      * Get the identity of a user using the alternative keyvalue than that of the sender.
      * @param correlationId

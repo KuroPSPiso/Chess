@@ -8,6 +8,7 @@ namespace Assets.Scripts.Messages
     public enum GameplayTypes
     {
         Connect,
+        Disconnect,
         Movement,
         Promotion,
         Turn,

@@ -108,7 +108,7 @@ c2275a8bfbb9f9942cad75ecdfded41d UnityEngine.HoloLens.dll:UnityEngine.VR.WSA.Spa
 663963a34d7c1afd9124429824d665cf Assembly-CSharp.dll:Assets.Scripts.GameManager
 641a19496d8d4a0b1c2cc6325fc265f5 Assembly-CSharp.dll:.Movement
 497261a24d62a019457d130d659ababd Assembly-CSharp.dll:.LookAt
-98d378dccf7464bc59eec76c62eb48db Assembly-CSharp.dll:.NMSManager
+9ee1e85705ba40d48aee65ff1360f376 Assembly-CSharp.dll:.NMSManager
 8621106c4e310d58dde83ab1d4945ad8 Assembly-CSharp.dll:.Zoomer
 fc1e0f4d8439d9928083474691511a13 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkAnimator
 05524b8f659e7bfe5756d1335fec24ba UnityEngine.Networking.dll:UnityEngine.Networking.NetworkBehaviour

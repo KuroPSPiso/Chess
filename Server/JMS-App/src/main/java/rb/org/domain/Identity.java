@@ -13,4 +13,9 @@ public class Identity {
     {
         this.destination = destination;
     }
+
+    public Destination getDestination()
+    {
+        return this.destination;
+    }
 }

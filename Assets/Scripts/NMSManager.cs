@@ -10,6 +10,7 @@ using Apache.NMS.ActiveMQ.Util;
 using System.Threading;
 using Apache.NMS.Util;
 using Assets.Scripts.Messages;
+using UnityEngine.SceneManagement;
 
 public class NMSManager : MonoBehaviour {
 
@@ -27,6 +28,7 @@ public class NMSManager : MonoBehaviour {
     public String gameID = "";
     public String userID = "";
     private String connectionString;
+    public Image connectionIndicator;
 
     Player player;
     bool connectionConfirmed;
@@ -45,12 +47,19 @@ public class NMSManager : MonoBehaviour {
     IMessageConsumer consumer;
 
     Thread _AsyncReadThread;
+    ITextMessage lastMessage = null;
 
     int iMsgCount = 0;
+    bool isStopping = false;
+    bool isStopped = false;
 
     // Use this for initialization
     void Start()
     {
+        //Allow application to run in the background
+        Application.runInBackground = true;
+        connectionIndicator.color = Color.yellow;
+
         this.player = GameObject.FindObjectOfType<Player>();
         this.connectionConfirmed = false;
         if (this.player == null)
@@ -67,29 +76,70 @@ public class NMSManager : MonoBehaviour {
 
         this.factory = new NMSConnectionFactory(connectUri);
         this.connection = factory.CreateConnection();
-        this.connection.ClientId = mTurnJSON.GetColourString(player.PlayerColour);
+
+        this.connection.ClientId = this.userID;
 
         this.ReloadData();
 
         session = connection.CreateSession();
         destination = SessionUtil.GetDestination(session, queue + queueVar);
         consumer = session.CreateConsumer(destination);
+        // Create a consumer and producer
+        consumer.Listener += new MessageListener(OnMessage);
         connection.Start();
         selfReference = this;
     }
 
     void UpdateText(String text)
     {
-        debugMessages += text;
+        if(debugMessages.Length == 0)
+        {
+            debugMessages = ":{" + text + "}:";
+        }
+        if (debugMessages.Length < 250 && debugMessages.Length > 0)
+        {
+            debugMessages = ":{" + text + "}:" + debugMessages.Substring(0, debugMessages.Length - text.Length);
+        }
+        else
+        {
+            debugMessages = ":{" + text + "}::{" + debugMessages.Substring(0, 250 - text.Length);
+        }
     }
 
     private void Update()
     {
         this.debugText.text = this.debugMessages;
+
+        if(isStopping)
+        {
+            connectionIndicator.color = Color.red;
+        }
+        else if(connectionConfirmed)
+        {
+            connectionIndicator.color = Color.green;
+        }
+        else
+        {
+            connectionIndicator.color = Color.yellow;
+        }
+
     }
 
     // Update is called once per frame
     void FixedUpdate() {
+        if(this.isStopped)
+        {
+            //return to menu
+            SceneManager.LoadScene(0);
+            return;
+        }
+        if (this.isStopping)
+        {
+            if (!this._AsyncReadThread.IsAlive)
+            {
+                this.isStopped = true;
+            }
+        }
         if(this.connection == null)
         {
             return; //connection created
@@ -128,10 +178,13 @@ public class NMSManager : MonoBehaviour {
         }
         _AsyncReadThread = new Thread(() =>
         {
+            if(isStopping)
+            {
+                return;
+            }
+
             try
             {
-                // Create a consumer and producer
-                consumer.Listener += new MessageListener(OnMessage);
                 // Consume a message
                 semaphore.WaitOne((int)receiveTimeout.TotalMilliseconds, true);
                 if (message == null)
@@ -140,11 +193,19 @@ public class NMSManager : MonoBehaviour {
                 }
                 else
                 {
+                    if(lastMessage == message)
+                    {
+                        return; //sameMessage
+                    }
+                    else
+                    {
+                        this.lastMessage = message;
+                    }
                     message.Acknowledge();
 
                     if (debug)
                     {
-                        selfReference.UpdateText("Received message with text: " + message.Text + "\n");
+                        selfReference.UpdateText("Received message with text: " + message.Text);
                     }
 
                     GameplayTypes gameTypes = GameplayTypes.NONE;
@@ -157,6 +218,15 @@ public class NMSManager : MonoBehaviour {
                     {
                         case GameplayTypes.Connect:
                             HandleConnectionMessage();
+                            break;
+                        case GameplayTypes.Disconnect:
+                            HandleDisconnectMessage();
+                            break;
+                        case GameplayTypes.Movement:
+                            break;
+                        case GameplayTypes.Turn:
+                            break;
+                        case GameplayTypes.Surrender:
                             break;
 
                         default:
@@ -183,15 +253,20 @@ public class NMSManager : MonoBehaviour {
     [ContextMenu("TestMessage")]
     public void SendTestMessage()
     {
+        if (connection == null)
+        {
+            return;
+        }
+
         try
         {
             IMessageProducer producer = session.CreateProducer(destination);
             //connection.Start();
 
             ITextMessage request = session.CreateTextMessage("SampleMessage" + iMsgCount.ToString());
-            request.Properties["FromUser"] = mTurnJSON.GetColourString(player.PlayerColour);
+            request.Properties["FromUser"] = this.userID;
 
-            if(player.PlayerColour.Equals(Color.black))
+            if (userID.Equals(mTurnJSON.GetColourString(Color.black)))
             {
                 request.Properties["ToUser"] = mTurnJSON.GetColourString(Color.white);
             }
@@ -199,6 +274,7 @@ public class NMSManager : MonoBehaviour {
             {
                 request.Properties["ToUser"] = mTurnJSON.GetColourString(Color.black);
             }
+            request.Properties["GameCode"] = this.gameID;
             request.NMSCorrelationID = this.gameID + "/" + this.userID;
             request.NMSReplyTo = destination;
             producer.Send(request);
@@ -213,15 +289,20 @@ public class NMSManager : MonoBehaviour {
 
     public void SendMessage(String message, String gameplayType)
     {
+        if(connection == null)
+        {
+            return;
+        }
+
         try
         {
             IMessageProducer producer = session.CreateProducer(destination);
             //connection.Start();
 
             ITextMessage request = session.CreateTextMessage(message);
-            request.Properties["FromUser"] = mTurnJSON.GetColourString(player.PlayerColour);
+            request.Properties["FromUser"] = this.userID;
 
-            if (player.PlayerColour.Equals(Color.black))
+            if (userID.Equals(mTurnJSON.GetColourString(Color.black)))
             {
                 request.Properties["ToUser"] = mTurnJSON.GetColourString(Color.white);
             }
@@ -229,6 +310,7 @@ public class NMSManager : MonoBehaviour {
             {
                 request.Properties["ToUser"] = mTurnJSON.GetColourString(Color.black);
             }
+            request.Properties["GameCode"] = this.gameID;
             request.Properties["GameType"] = gameplayType;
             request.NMSCorrelationID = this.gameID + "/" + this.userID;
             request.NMSReplyTo = this.destination;
@@ -243,6 +325,11 @@ public class NMSManager : MonoBehaviour {
     public void SendConnectMessage()
     {
         SendMessage("Connect", GameplayTypes.Connect.ToString());
+    }
+
+    public void SendDisconnectMessage()
+    {
+        SendMessage("Disconnect", GameplayTypes.Disconnect.ToString());
     }
 
     public void SendMovementMessage(mMovementJSON movement)
@@ -260,11 +347,11 @@ public class NMSManager : MonoBehaviour {
         SendMessage(turn.toJson(), GameplayTypes.Turn.ToString());
     }
 
-    public void SendFinish()
+    public void SendFinishMessage()
     {
         SendMessage("Finished", GameplayTypes.Finish.ToString());
     }
-    public void SendSurrender()
+    public void SendSurrenderMessage()
     {
         SendMessage("Surrender", GameplayTypes.Surrender.ToString());
     }
@@ -273,5 +360,42 @@ public class NMSManager : MonoBehaviour {
     {
         //normally load history
         connectionConfirmed = true; //Finally confirm connection and use of previously saved data if available.
+    }
+
+    public void HandleDisconnectMessage()
+    {
+        if (_AsyncReadThread != null)
+        {
+            while (_AsyncReadThread.IsAlive)
+            {
+                try
+                {
+                    selfReference.UpdateText("Very Funny");
+                    isStopping = true;
+                    message = null;
+                    semaphore.Set();
+                    connection.Stop();
+                    connection.Dispose();
+                    connection = null;
+                }
+                catch (Exception ex)
+                {
+                    //interupt caught
+                    selfReference.UpdateText(ex.Message);
+                }
+
+
+                try
+                {
+                    _AsyncReadThread.Abort();
+                    _AsyncReadThread = null;
+                }
+                catch (Exception ex)
+                {
+                    //interupt caught
+                    selfReference.UpdateText(ex.Message);
+                }
+            }
+        }
     }
 }

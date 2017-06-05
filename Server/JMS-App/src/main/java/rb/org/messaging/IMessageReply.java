@@ -1,6 +1,7 @@
 package rb.org.messaging;
 
 import rb.org.Console;
+import rb.org.domain.GameplayTypes;
 
 import javax.jms.*;
 
@@ -9,10 +10,20 @@ import javax.jms.*;
  */
 public interface IMessageReply {
 
-    void sendMessage(
+    TextMessage sendMessage(
             Session session,
             Message messageReceived,
             TextMessage mutatedMessageReceived,
+            MessageProducer messageProducer,
+            Destination destination
+    );
+
+    TextMessage sendMessage(
+            Session session,
+            Message messageReceived,
+            TextMessage mutatedMessageReceived,
+            String newMessage,
+            GameplayTypes newGameType,
             MessageProducer messageProducer,
             Destination destination
     );

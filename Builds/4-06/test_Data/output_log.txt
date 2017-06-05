@@ -23,28 +23,29 @@ Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\Apache.NMS.dll (th
 Loading E:\DPI\Chess\Builds\4-06\test_Data\Managed\Apache.NMS.dll into Unity Child Domain
 Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.dll (this message is harmless)
 Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Core.dll (this message is harmless)
-- Completed reload, in  0.030 seconds
+- Completed reload, in  0.026 seconds
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 3.108610 ms
+UnloadTime: 1.106766 ms
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: 4a48 -> priority: 1 
-  Thread -> id: 60bc -> priority: 1 
-  Thread -> id: 5e0c -> priority: 1 
-  Thread -> id: 3f20 -> priority: 1 
+  Thread -> id: 45c -> priority: 1 
+  Thread -> id: 35f4 -> priority: 1 
+  Thread -> id: 39fc -> priority: 1 
+  Thread -> id: 1cc -> priority: 1 
 Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 2.929423 ms
+UnloadTime: 3.750945 ms
 
-Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1258.
-Total: 0.629077 ms (FindLiveObjects: 0.135993 ms CreateObjectMapping: 0.029508 ms MarkObjects: 0.441337 ms  DeleteObjects: 0.021382 ms)
+Unloading 9 unused Assets to reduce memory usage. Loaded Objects now: 1285.
+Total: 0.548678 ms (FindLiveObjects: 0.103492 ms CreateObjectMapping: 0.034639 ms MarkObjects: 0.388308 ms  DeleteObjects: 0.021810 ms)
 
 Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Xml.dll (this message is harmless)
 Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Transactions.dll (this message is harmless)
 Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Web.dll (this message is harmless)
 Platform assembly: E:\DPI\Chess\Builds\4-06\test_Data\Managed\System.Configuration.dll (this message is harmless)
-InvalidClientIDException: Broker: localhost - Client: WHITE already connected from tcp://127.0.0.1:54215
-  at Apache.NMS.ActiveMQ.Connection.CheckConnected () [0x00000] in <filename unknown>:0 
- 
-(Filename:  Line: -1)
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 0.759939 ms
+
+Unloading 82 unused Assets to reduce memory usage. Loaded Objects now: 353.
+Total: 0.569633 ms (FindLiveObjects: 0.025659 ms CreateObjectMapping: 0.015395 ms MarkObjects: 0.381466 ms  DeleteObjects: 0.146685 ms)
 

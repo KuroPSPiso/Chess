@@ -107,7 +107,19 @@ public class ChessServer implements MessageListener {
                     case Connect:
                         reply = new ConnectMessage(gameplayType.toString(), console);
                         reply.sendMessage(session, message, txtMsg, this.replyProducer, message.getJMSDestination());
-                        this.identityHolder.putIdentity(message.getJMSCorrelationID(), new Identity(message.getJMSDestination()));
+                        Identity identityFound = this.identityHolder.putIdentity(message.getJMSCorrelationID(), new Identity(message.getJMSDestination()));
+
+                        //disconnect old user if data is still available
+                        if(identityFound != null) {
+                            reply.sendMessage(session, message, txtMsg, "Disconnect", GameplayTypes.Disconnect, this.replyProducer, identityFound.getDestination());
+                        }
+                        //TODO:resend all data to new user
+                        break;
+                    case Disconnect:
+                        reply = new PingMessage(gameplayType.toString(), console);
+                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSDestination());
+
+                        this.identityHolder.removeIdentity(message.getJMSCorrelationID());
                         break;
                     case Movement:
                         break;
@@ -119,7 +131,7 @@ public class ChessServer implements MessageListener {
                         break;
                     case Surrender:
                         break;
-                    default:
+                    default: //the following tasks rely on direct postback messages:
                         reply = new PingMessage(gameplayType.toString(), console);
                         reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSDestination());
                         break;

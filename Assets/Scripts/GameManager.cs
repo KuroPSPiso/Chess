@@ -7,6 +7,8 @@ namespace Assets.Scripts
 {
     public class GameManager : MonoBehaviour
     {
+        private Player player;
+
         public Transform AFileRoot;
         public Transform BFileRoot;
         public Transform CFileRoot;
@@ -19,6 +21,7 @@ namespace Assets.Scripts
         public List<Pawn> whitePawns;
         public List<Pawn> blackPawns;
 
+        int pawnIndexCounter;
         public CheckSpace[,] cells = new CheckSpace[8,8]; //expected 64 (8x8)
 
         public bool isWhitesTurn = false;
@@ -34,14 +37,26 @@ namespace Assets.Scripts
         public GameObject prefabRook;
         public GameObject prefabPawn;
 
+        public bool isReadyToOperate; //get's disabled after initialisation.
+        public bool isInitialised;
+
         public void Start()
         {
+            this.player = GameObject.FindObjectOfType<Player>();
+            this.pawnIndexCounter = 0;
+            this.isReadyToOperate = false;
+            this.isInitialised = false;
+
             InitiateSetup();
+
+            this.isReadyToOperate = true;
         }
 
         private void InitiateSetup()
         {
             SetupCells();
+
+            //Due to the nature of JMS this will always occur at this moment
             if (!HasActiveGame())
             {
                 NewGame();
@@ -52,10 +67,9 @@ namespace Assets.Scripts
         {
             bool hasActiveGame = false;
 
-            //TODO: fetch from server if already ingame. get colour of current user.
             if(!isWhitesTurn && !isBlacksTurn)
             {
-                this.isWhitesTurn = true; //White always starts first
+                this.isWhitesTurn = false; //White always starts first - BUT WITH THE SERVER THIS IS DISABLED
             }
             return hasActiveGame;
         }
@@ -102,10 +116,13 @@ namespace Assets.Scripts
                     pawnEntity.transform.rotation = Quaternion.Euler(0, 270, 0);
 
                     Pawn pawn = pawnEntity.GetComponent<Pawn>();
+                    pawn.SetPawnID(pawnIndexCounter);
                     pawn.UpdateLocation(this.cells[x, y]);
                     pawn.UpdateColour(Color.white, this.matWhite);
                     whitePawns.Add(pawn);
 					pawn.transform.SetParent(this.transform);
+
+                    pawnIndexCounter++;
                 }
             }
 
@@ -149,10 +166,13 @@ namespace Assets.Scripts
                     pawnEntity.transform.rotation = Quaternion.Euler(0, 90, 0);
 
                     Pawn pawn = pawnEntity.GetComponent<Pawn>();
+                    pawn.SetPawnID(pawnIndexCounter);
                     pawn.UpdateLocation(this.cells[x, y]);
                     pawn.UpdateColour(Color.black, this.matBlack);
                     whitePawns.Add(pawn);
 					pawn.transform.SetParent(this.transform);
+
+                    pawnIndexCounter++;
                 }
             }
         }
@@ -259,5 +279,9 @@ namespace Assets.Scripts
             }
         }
 
+        private void Update()
+        {
+
+        }
     }
 }

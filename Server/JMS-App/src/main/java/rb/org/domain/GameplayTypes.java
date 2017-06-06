@@ -6,6 +6,7 @@ package rb.org.domain;
 public enum GameplayTypes {
     Connect("Connect"),
     Disconnect("Disconnect"),
+    Initialised("Initialised"),
     Movement("Movement"),
     Promotion("Promotion"),
     Turn("Turn"),

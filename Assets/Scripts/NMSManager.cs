@@ -11,6 +11,7 @@ using System.Threading;
 using Apache.NMS.Util;
 using Assets.Scripts.Messages;
 using UnityEngine.SceneManagement;
+using Assets.Scripts;
 
 public class NMSManager : MonoBehaviour {
 
@@ -29,6 +30,14 @@ public class NMSManager : MonoBehaviour {
     public String userID = "";
     private String connectionString;
     public Image connectionIndicator;
+
+    [Header("GameInformation")]
+    public GameManager gameManager; //Gamelogic
+    public Text gameInfo;
+    public LookAt checkPositionTarget; //Mouse controlled position finder
+    private CheckSpace selectedCheckspace = null;
+    public Material highlightMaterial;
+    private Material oldMaterial = null;
 
     Player player;
     bool connectionConfirmed;
@@ -86,6 +95,7 @@ public class NMSManager : MonoBehaviour {
         consumer = session.CreateConsumer(destination);
         // Create a consumer and producer
         consumer.Listener += new MessageListener(OnMessage);
+        connection.RedeliveryPolicy = new Apache.NMS.Policies.RedeliveryPolicy() { MaximumRedeliveries = 0 }; //TODO: remove?
         connection.Start();
         selfReference = this;
     }
@@ -123,6 +133,7 @@ public class NMSManager : MonoBehaviour {
             connectionIndicator.color = Color.yellow;
         }
 
+        ExecuteGameLogic();
     }
 
     // Update is called once per frame
@@ -130,6 +141,10 @@ public class NMSManager : MonoBehaviour {
         if(this.isStopped)
         {
             //return to menu
+            if (this.player != null)
+            {
+                GameObject.DestroyImmediate(this.player.gameObject);
+            }
             SceneManager.LoadScene(0);
             return;
         }
@@ -193,9 +208,16 @@ public class NMSManager : MonoBehaviour {
                 }
                 else
                 {
-                    if(lastMessage == message)
+                    if (lastMessage != null)
                     {
-                        return; //sameMessage
+                        if (lastMessage.NMSMessageId == message.NMSMessageId)
+                        {
+                            return; //sameMessage
+                        }
+                        else
+                        {
+                            this.lastMessage = message;
+                        }
                     }
                     else
                     {
@@ -221,6 +243,9 @@ public class NMSManager : MonoBehaviour {
                             break;
                         case GameplayTypes.Disconnect:
                             HandleDisconnectMessage();
+                            break;
+                        case GameplayTypes.Initialised:
+                            HandleInitialisedMessage();
                             break;
                         case GameplayTypes.Movement:
                             break;
@@ -248,6 +273,16 @@ public class NMSManager : MonoBehaviour {
     {
         message = receivedMsg as ITextMessage;
         semaphore.Set();
+
+        //if (this.processor.ReceiveMessage(textMessage))
+        //{
+        //    this.session.Commit();
+        //}
+        //else
+        //{
+        //    Console.WriteLine("Error - returning message to queue.");
+        //    this.session.Rollback();
+        //}
     }
 
     [ContextMenu("TestMessage")]
@@ -362,6 +397,24 @@ public class NMSManager : MonoBehaviour {
         connectionConfirmed = true; //Finally confirm connection and use of previously saved data if available.
     }
 
+    public void HandleInitialisedMessage()
+    {
+        if (!gameManager.isInitialised)
+        {
+            if (gameManager.isReadyToOperate)
+            {
+                gameManager.isReadyToOperate = false; //disable
+            }
+            gameManager.isInitialised = true;
+
+            if(!gameManager.isBlacksTurn && !gameManager.isWhitesTurn)
+            {
+                //first turn, white goes first always
+                gameManager.isWhitesTurn = true; //Not required to send a message as this get's auto set after initialisation.
+            }
+        }
+    }
+
     public void HandleDisconnectMessage()
     {
         if (_AsyncReadThread != null)
@@ -395,6 +448,62 @@ public class NMSManager : MonoBehaviour {
                     //interupt caught
                     selfReference.UpdateText(ex.Message);
                 }
+            }
+        }
+    }
+
+    private void ExecuteGameLogic()
+    {
+        if(!gameManager.isInitialised)
+        {
+            //wait for ready state of operation so it's interactable
+            gameInfo.text = "Setting up";
+            return;
+        }
+
+        //check if can move
+        if (mTurnJSON.GetColour(this.userID).Equals(Color.white))
+        {
+            if(!gameManager.isWhitesTurn)
+            {
+                gameInfo.text = "It's your opponents turn (Black)";
+                return; //not your turn;
+            }
+            else
+            {
+                gameInfo.text = "It's Your turn (White)";
+            }
+        }
+        else
+        {
+            if (!gameManager.isBlacksTurn)
+            {
+                gameInfo.text = "It's your opponents turn (White)";
+                return; //not your turn;
+            }
+            else
+            {
+                gameInfo.text = "It's Your turn (Black)";
+            }
+        }
+
+        if(Input.GetMouseButtonUp(0) && this.checkPositionTarget.targetCheckSpace != null)
+        {
+            if(this.selectedCheckspace != null)
+            {
+                this.selectedCheckspace.gameObject.GetComponent<Renderer>().material = oldMaterial;
+                this.selectedCheckspace = null;
+            }
+            this.selectedCheckspace = this.checkPositionTarget.targetCheckSpace;
+            this.oldMaterial = this.selectedCheckspace.gameObject.GetComponent<Renderer>().material;
+            this.selectedCheckspace.gameObject.GetComponent<Renderer>().material = highlightMaterial;
+        }
+        else if(Input.GetMouseButtonUp(1))
+        {
+            if (this.selectedCheckspace != null)
+            {
+                this.selectedCheckspace.gameObject.GetComponent<Renderer>().material = oldMaterial;
+                this.selectedCheckspace = null;
             }
         }
     }

@@ -9,6 +9,7 @@ namespace Assets.Scripts.Messages
     {
         Connect,
         Disconnect,
+        Initialised,
         Movement,
         Promotion,
         Turn,

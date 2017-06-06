@@ -49,7 +49,14 @@ public class AMessageReply implements IMessageReply {
             response.setJMSCorrelationID(messageReceived.getJMSCorrelationID());
 
             toSend = response;
+            messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
             messageProducer.send(destination, response);
+
+//            try {
+//                Thread.sleep(1000); //Send Safety (?)
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         } catch (JMSException e) {
             //Handle the exception appropriately
         }
@@ -80,7 +87,14 @@ public class AMessageReply implements IMessageReply {
             response.setJMSCorrelationID(messageReceived.getJMSCorrelationID());
 
             toSend = response;
+            messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
             messageProducer.send(destination, response);
+
+//            try {
+//                Thread.sleep(1000); //Send Safety (?)
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
         } catch (JMSException e) {
             //Nothing to handle at this point
         }

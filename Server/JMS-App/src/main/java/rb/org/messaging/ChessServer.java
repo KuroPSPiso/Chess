@@ -73,7 +73,7 @@ public class ChessServer implements MessageListener {
             connection = connectionFactory.createConnection();
             connection.start();
             this.session = connection.createSession(this.transacted, ackMode);
-            Destination chessQueue = this.session.createQueue(messageQueueName);
+            Destination chessQueue = this.session.createTopic(messageQueueName);
 
             //Setup a message producer to respond to messages from clients, we will get the destination
             //to send to from the JMSReplyTo header field from a Message
@@ -107,8 +107,8 @@ public class ChessServer implements MessageListener {
                 {
                     case Connect:
                         reply = new ConnectMessage(gameplayType.toString(), console);
-                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSDestination());
-                        Identity identityFound = this.identityHolder.putIdentity(message.getJMSCorrelationID(), new Identity(message.getJMSDestination()));
+                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSReplyTo());
+                        Identity identityFound = this.identityHolder.putIdentity(message.getJMSCorrelationID(), new Identity(message.getJMSReplyTo()));
 
                         //disconnect old user if data is still available
                         if(identityFound != null) {
@@ -119,11 +119,11 @@ public class ChessServer implements MessageListener {
                         MessageProducer initProducer = this.session.createProducer(null);
                         initProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
                         InitializedMessage sendInit = new InitializedMessage(GameplayTypes.Initialised.toString(), console);
-                        sendInit.sendMessage(this.session, message, txtMsg, "Initialised", GameplayTypes.Initialised, initProducer, message.getJMSDestination());
+                        sendInit.sendMessage(this.session, message, txtMsg, "Initialised", GameplayTypes.Initialised, initProducer, message.getJMSReplyTo());
                         break;
                     case Disconnect:
                         reply = new PingMessage(gameplayType.toString(), console);
-                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSDestination());
+                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSReplyTo());
 
                         this.identityHolder.removeIdentity(message.getJMSCorrelationID());
                         break;
@@ -139,7 +139,7 @@ public class ChessServer implements MessageListener {
                         break;
                     default: //the following tasks rely on direct postback messages:
                         reply = new PingMessage(gameplayType.toString(), console);
-                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSDestination());
+                        reply.sendMessage(this.session, message, txtMsg, this.replyProducer, message.getJMSReplyTo());
                         break;
                 }
             }

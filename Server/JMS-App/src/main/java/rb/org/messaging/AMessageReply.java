@@ -4,6 +4,7 @@ import rb.org.Console;
 import rb.org.domain.GameplayTypes;
 
 import javax.jms.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -33,7 +34,9 @@ public class AMessageReply implements IMessageReply {
 
             if(console != null)
             {
-                console.println(String.format("[%1s]:[%2s]:'%3s'", messageReceived.getStringProperty("FromUser"), new Date(), executionType));
+                SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
+                String time = localDateFormat.format(new Date());
+                console.println(String.format("[%1s]:[%2s]:'%3s'-%4s", messageReceived.getStringProperty("FromUser"), time, executionType, destination.toString()));
             }
             try {
                 response.setStringProperty("FromUser", messageReceived.getStringProperty("FromUser"));
@@ -71,7 +74,9 @@ public class AMessageReply implements IMessageReply {
 
             if(console != null)
             {
-                console.println(String.format("[%1s]:[%2s]:'%3s'", messageReceived.getStringProperty("FromUser"), new Date(), executionType));
+                SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
+                String time = localDateFormat.format(new Date());
+                console.println(String.format("[%1s]:[%2s]:'%3s'-%4s", messageReceived.getStringProperty("FromUser"), time, executionType, destination.toString()));
             }
             response.setText(newMessage);
             try {

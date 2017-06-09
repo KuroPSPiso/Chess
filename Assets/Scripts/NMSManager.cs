@@ -53,7 +53,11 @@ public class NMSManager : MonoBehaviour {
     public String connectionUri = "tcp://localhost:61616";
     ISession session;
     IDestination destination;
-    IMessageConsumer consumer;
+    IMessageProducer consumer;
+
+    ITemporaryQueue tempQueue;
+    IDestination replyToDestination;
+    IMessageConsumer responseConsumer;
 
     Thread _AsyncReadThread;
     ITextMessage lastMessage = null;
@@ -85,17 +89,20 @@ public class NMSManager : MonoBehaviour {
 
         this.factory = new NMSConnectionFactory(connectUri);
         this.connection = factory.CreateConnection();
-
-        this.connection.ClientId = this.userID;
+        this.connection.ClientId = this.gameID + "/" + this.userID;
+        this.connection.RedeliveryPolicy = new Apache.NMS.Policies.RedeliveryPolicy() { MaximumRedeliveries = 0 }; //TODO: remove?
 
         this.ReloadData();
 
         session = connection.CreateSession();
-        destination = SessionUtil.GetDestination(session, queue + queueVar);
-        consumer = session.CreateConsumer(destination);
+        destination = SessionUtil.GetDestination(session, "client.messages");
+        consumer = session.CreateProducer(destination);
         // Create a consumer and producer
-        consumer.Listener += new MessageListener(OnMessage);
-        connection.RedeliveryPolicy = new Apache.NMS.Policies.RedeliveryPolicy() { MaximumRedeliveries = 0 }; //TODO: remove?
+        this.tempQueue = session.CreateTemporaryQueue();
+        this.replyToDestination = SessionUtil.GetDestination(session, this.tempQueue.QueueName, this.tempQueue.DestinationType);
+        this.responseConsumer = session.CreateConsumer(this.replyToDestination);
+
+        this.responseConsumer.Listener += new MessageListener(OnMessage);
         connection.Start();
         selfReference = this;
     }
@@ -106,13 +113,19 @@ public class NMSManager : MonoBehaviour {
         {
             debugMessages = ":{" + text + "}:";
         }
-        if (debugMessages.Length < 250 && debugMessages.Length > 0)
+        else if(debugMessages.Length < 250 && debugMessages.Length > 0)
         {
-            debugMessages = ":{" + text + "}:" + debugMessages.Substring(0, debugMessages.Length - text.Length);
+            debugMessages = ":{" + text + "}:" + debugMessages;
         }
         else
         {
             debugMessages = ":{" + text + "}::{" + debugMessages.Substring(0, 250 - text.Length);
+        }
+
+        //reformat again
+        if (debugMessages.Length > 250)
+        {
+            debugMessages = debugMessages.Substring(0, 250);
         }
     }
 
@@ -150,7 +163,13 @@ public class NMSManager : MonoBehaviour {
         }
         if (this.isStopping)
         {
-            if (!this._AsyncReadThread.IsAlive)
+            if (this._AsyncReadThread != null)
+            {
+                if (!this._AsyncReadThread.IsAlive)
+                {
+                    this.isStopped = true;
+                }
+            } else
             {
                 this.isStopped = true;
             }
@@ -208,6 +227,11 @@ public class NMSManager : MonoBehaviour {
                 }
                 else
                 {
+                    if(message.NMSCorrelationID != this.gameID + "/" + this.userID)
+                    {
+                        //message is not ment for you;
+                        return;
+                    }
                     if (lastMessage != null)
                     {
                         if (lastMessage.NMSMessageId == message.NMSMessageId)
@@ -312,6 +336,7 @@ public class NMSManager : MonoBehaviour {
             request.Properties["GameCode"] = this.gameID;
             request.NMSCorrelationID = this.gameID + "/" + this.userID;
             request.NMSReplyTo = destination;
+            request.NMSReplyTo = this.replyToDestination;
             producer.Send(request);
 
             iMsgCount++;
@@ -349,6 +374,7 @@ public class NMSManager : MonoBehaviour {
             request.Properties["GameType"] = gameplayType;
             request.NMSCorrelationID = this.gameID + "/" + this.userID;
             request.NMSReplyTo = this.destination;
+            request.NMSReplyTo = this.replyToDestination;
             producer.Send(request);
         }
         catch (NMSConnectionException ex)
@@ -417,14 +443,14 @@ public class NMSManager : MonoBehaviour {
 
     public void HandleDisconnectMessage()
     {
+        isStopping = true;
         if (_AsyncReadThread != null)
         {
             while (_AsyncReadThread.IsAlive)
             {
                 try
                 {
-                    selfReference.UpdateText("Very Funny");
-                    isStopping = true;
+                    selfReference.UpdateText("Disconnecting");
                     message = null;
                     semaphore.Set();
                     connection.Stop();
